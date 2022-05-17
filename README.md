@@ -1,6 +1,6 @@
 # Snake.py
 <img
-     src="./Demo/snake.gif"
+     src="./Demo/snake-demo.gif"
      alt="Demo of Snake game"
 />
 ## Description:
