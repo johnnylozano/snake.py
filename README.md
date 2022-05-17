@@ -1,5 +1,7 @@
 # Snake.py
-Famous snake game implemented on Raspberry Pi which utilizes physical joystick from the Sense HAT hardware attachment.
+<img src="Demo/snake.gif"
+     alt="Demo of Snake game"
+/>
 ## Description:
 The player controls a long, thin creature, resembling a snake, which roams around on a bordered plane,
 picking up food (or some other item), trying to avoid hitting its own tail or the edges of the playing area.
@@ -13,7 +15,4 @@ Intended for Raspberry Pi Model 4 with Sense HAT
 - To stop it, press ctrl-c
 - To enable/disable on startup, edit sudo nano /etc/rc.local
 
-## Demo:
-<img src="Demo/snake.gif"
-     alt="Demo of Snake game"
-/>
+
