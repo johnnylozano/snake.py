@@ -76,12 +76,16 @@ class Snake:
     def head(self):
         return self.segments[0]
 
-    def Grow(self):
+    def grow_snake(self):
+        """Grows the snake after the player eats the apple."""
+
         # Clone the tail
         v = Vec2(self.segments[-1].x, self.segments[-1].y)
         self.segments.append(v)
 
-    def Move(self):
+    def move_snake(self):
+        """Moves all segments of the snake by 1 block."""
+
         # First move all body segments up by 1
         for i in range(len(self.segments) - 1, 0, -1):
             self.segments[i].x = self.segments[i - 1].x
@@ -95,9 +99,8 @@ class Snake:
         self.segments[0].x %= 8
         self.segments[0].y %= 8
 
-    def CheckForCollide(self):
-        # if len(self.segments) == 1:
-        #     return False
+    def check_for_collision(self):
+        """Checks if snake collides with itself."""
 
         # Skip the head with segments[1:]
         for segment in self.segments[1:]:
@@ -109,9 +112,14 @@ class Snake:
 ## Global functions ##
 ######################
 
-# Cause a left-to-right screen wipe, starting bright and ending dark
-def WipeScreen():
-    # 8 shades of grey, from white to black
+
+def wipe_screen():
+    """
+    Cause a left-to-right screen wipe, starting bright and ending dark
+    
+    8 shades of grey, from white to black
+    """
+
     greys = []
     c = 255
 
@@ -159,8 +167,8 @@ def WipeScreen():
     sleep(0.1)
 
 
-# Draw the whole grid to screen
-def DrawState():
+def draw_state():
+    """Draws the whole grid to the screen"""
     for x in range(len(grid)):
         for y in range(len(grid[x])):
             c = colorDict[grid[x][y]]
@@ -168,7 +176,8 @@ def DrawState():
 
 
 # Pick a random x and y until the space is empty
-def CreateApple():
+def create_apple():
+    """Places apple in a random unoccupied space."""
     x = randrange(8)
     y = randrange(8)
     while grid[x][y] != 0:
@@ -179,12 +188,18 @@ def CreateApple():
 
 
 # Triggered if all squares are body or head
-def Win():
-    # Play animation
+def win_game():
+    """
+    Plays animation if player wins the game.
+    
+    Triggered if all squares are snake body or head.
+    """
     pass
 
 
-def Update():
+def update_game():
+    """Handles dynamic events of the game."""
+
     # Wait for 1 second at the start, and speed up the higher the score gets
     sleep((65 - len(snake.segments)) / 64)
 
@@ -212,15 +227,15 @@ def Update():
         # Remove oldest event from the queue.
         es.pop(0)
 
-    # Update positions
-    snake.Move()
+    # update_game positions
+    snake.move_snake()
 
     # Check for lose
-    die = snake.CheckForCollide()
+    die = snake.check_for_collision()
 
     # Check for eat
     if grid[snake.head.x][snake.head.y] == APPLE:
-        snake.Grow()
+        snake.grow_snake()
         # Check for win
         foundEmpty = False
         for x in range(8):
@@ -231,12 +246,12 @@ def Update():
                     foundEmpty = True
                     break
         if foundEmpty:
-            CreateApple()
+            create_apple()
         else:
-            Win()
+            win_game()
             return False
 
-    # Update graphics
+    # update_game graphics
 
     ## Clear grid
     for x in range(8):
@@ -251,13 +266,14 @@ def Update():
         grid[segment.x][segment.y] = BODY
     grid[snake.head.x][snake.head.y] = HEAD
 
-    DrawState()
+    draw_state()
 
     return not die
 
 
-def StartGame():
-    WipeScreen()
+def start_game():
+    """Initialize the game"""
+    wipe_screen()
 
     # Make an 8x8 grid
     global grid
@@ -266,10 +282,11 @@ def StartGame():
     global snake
     snake = Snake()
 
-    CreateApple()
+    create_apple()
 
 
-def LoseScreen():
+def lose_screen():
+    """Animation pattern triggered if the player loses."""
 
     # Checkerboard pattern to be filled later
     checker = []
@@ -304,8 +321,8 @@ def LoseScreen():
 ###############
 
 while True:
-    StartGame()
-    while Update():
+    start_game()
+    while update_game():
         pass
-    LoseScreen()
+    lose_screen()
 
