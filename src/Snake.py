@@ -46,7 +46,7 @@ PURPLE = (127, 0, 127)
 BLACK = (0, 0, 0)
 
 # Integer -> color dictionary
-colorDict = {
+color_dict = {
     0: (0, 0, 0),  # blank
     APPLE: (255, 0, 0),  # red apple
     BODY: (0, 255, 0),  # green snake
@@ -171,7 +171,7 @@ def draw_state():
     """Draws the whole grid to the screen"""
     for x in range(len(grid)):
         for y in range(len(grid[x])):
-            c = colorDict[grid[x][y]]
+            c = color_dict[grid[x][y]]
             sense.set_pixel(x, y, c)
 
 
