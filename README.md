@@ -19,7 +19,7 @@ Intended for Raspberry Pi Model 4 with Sense HAT
 
 ## Installation:
 (Operate from Raspberry Pi command terminal or from Remote SSH connection)
-- To run this, either run `python3 main.py` or `chmod +x main.py; ./main.py`
+- To run this, either run `python3 Snake.py` or `chmod +x Snake.py; ./Snake.py`
 - To stop it, press ctrl-c
 - To enable/disable on startup, edit sudo nano /etc/rc.local
 
