@@ -44,6 +44,7 @@ HEAD = 3
 RED = (255, 0, 0)
 PURPLE = (127, 0, 127)
 BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
 
 # Integer -> color dictionary
 color_dict = {
@@ -194,7 +195,28 @@ def win_game():
     
     Triggered if all squares are snake body or head.
     """
-    pass
+    # Checkerboard pattern to be filled later
+    checker = []
+
+    j = 0
+    for i in range(64):
+        i = i % 8
+
+        # offset every other row
+        if i == 0:
+            j += 1
+
+        c = PURPLE if (i + j) % 2 == 0 else WHITE
+        checker.append(c)
+
+    # Show 10 frames of animation
+    for _ in range(10):
+        sense.set_pixels(checker)
+
+        # Swap colors
+        for i in range(len(checker)):
+            checker[i] = PURPLE if checker[i] == WHITE else WHITE
+        sleep(1 / 6)
 
 
 def update_game():
