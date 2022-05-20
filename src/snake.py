@@ -13,7 +13,7 @@
 ##   making the game increasingly difficult.
 ##
 ## Installation:
-##   To run this, either run `python3 main.py` or `chmod +x main.py; ./main.py`
+##   To run this, either run `python3 snake.py` or `chmod +x snake.py; ./snake.py`
 ##   To stop it, press ctrl-c
 ##   To enable/disable this on startup, edit sudo nano /etc/rc.local
 ################################################################################################
