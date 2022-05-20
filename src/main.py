@@ -1,5 +1,5 @@
 ################################################################################################
-## Title: Snake.py
+## Title: Snake
 ## Author: Johnny Lozano
 ##
 ## Hardware Requirements:
@@ -44,13 +44,10 @@ HEAD = 3
 RED = (255, 0, 0)
 PURPLE = (127, 0, 127)
 BLACK = (0, 0, 0)
-
-GRID_SIZE = 64
-GRID_LEN = 8
-DOUBLE_GRID_LEN = (2 * GRID_LEN) + 1
+WHITE = (255, 255, 255)
 
 # Integer -> color dictionary
-colorDict = {
+color_dict = {
     0: (0, 0, 0),  # blank
     APPLE: (255, 0, 0),  # red apple
     BODY: (0, 255, 0),  # green snake
@@ -71,7 +68,7 @@ class Vec2:
 
 class Snake:
     def __init__(self):
-        self.segments = [Vec2(randrange(GRID_LEN), randrange(GRID_LEN))]
+        self.segments = [Vec2(randrange(8), randrange(8))]
         self.direction = [1, 0]
 
     # @property can be placed above methods to let them be accessed
@@ -80,12 +77,16 @@ class Snake:
     def head(self):
         return self.segments[0]
 
-    def Grow(self):
+    def grow_snake(self):
+        """Grows the snake after the player eats the apple."""
+
         # Clone the tail
         v = Vec2(self.segments[-1].x, self.segments[-1].y)
         self.segments.append(v)
 
-    def Move(self):
+    def move_snake(self):
+        """Moves all segments of the snake by 1 block."""
+
         # First move all body segments up by 1
         for i in range(len(self.segments) - 1, 0, -1):
             self.segments[i].x = self.segments[i - 1].x
@@ -96,12 +97,11 @@ class Snake:
         self.segments[0].y += self.direction[1]
 
         # And wrap around the field
-        self.segments[0].x %= GRID_LEN
-        self.segments[0].y %= GRID_LEN
+        self.segments[0].x %= 8
+        self.segments[0].y %= 8
 
-    def CheckForCollide(self):
-        # if len(self.segments) == 1:
-        #     return False
+    def check_for_collision(self):
+        """Checks if snake collides with itself."""
 
         # Skip the head with segments[1:]
         for segment in self.segments[1:]:
@@ -113,19 +113,24 @@ class Snake:
 ## Global functions ##
 ######################
 
-# Cause a left-to-right screen wipe, starting bright and ending dark
-def WipeScreen():
-    # 8 shades of grey, from white to black
+
+def wipe_screen():
+    """
+    Cause a left-to-right screen wipe, starting bright and ending dark
+    
+    8 shades of grey, from white to black
+    """
+
     greys = []
     c = 255
 
     # Create the 8 step gradient from white to black
-    for i in range(GRID_LEN):
+    for i in range(8):
         greys.append((c, c, c))
-        c = int(c * ((GRID_LEN - i) / GRID_LEN))
+        c = int(c * ((8 - i) / 8))
 
     # Pad with 8 blacks
-    for i in range(GRID_LEN):
+    for i in range(8):
         greys.append((0, 0, 0))
 
     # How many columns past the right end we are
@@ -133,63 +138,92 @@ def WipeScreen():
 
     # We want to fade *all* squares to black, so we need do 16 instead of 8.
     # xr stands for x right, xl stands for x left.
-    for xr in range(DOUBLE_GRID_LEN):
-        if xr >= GRID_LEN:
+    for xr in range(17):
+        if xr >= 8:
             over += 1
         for xl in range(xr):
+            # This... just seems to work. I'm not sure why it's 5 instead of 8.
             colIndex = 5 - xl + over
             # We can't set anything beyond x=7, so just skip them
-            if xl > (GRID_LEN - 1):
+            if xl > 7:
                 break
                 # continue
             # Set the whole column to the color
-            for y in range(GRID_LEN):
+            for y in range(8):
                 sense.set_pixel(xl, y, greys[colIndex])
         # Wait for a bit, otherwise it's not really an animation.
-        sleep(1 / GRID_LEN)
+        sleep(1 / 8)
 
     # Ready...
     sense.set_pixel(0, 0, 255, 0, 0)
     sleep(1)
     # Get set...
-    sense.set_pixel((GRID_LEN - 1), 0, 255, 255, 0)
+    sense.set_pixel(7, 0, 255, 255, 0)
     sleep(1)
     # And...
-    sense.set_pixel(0, (GRID_LEN - 1), 255, 0, 255)
+    sense.set_pixel(0, 7, 255, 0, 255)
     sleep(1)
     # Go!
-    sense.set_pixel((GRID_LEN - 1), (GRID_LEN - 1), 255, 255, 255)
+    sense.set_pixel(7, 7, 255, 255, 255)
     sleep(0.1)
 
 
-# Draw the whole grid to screen
-def DrawState():
+def draw_state():
+    """Draws the whole grid to the screen"""
     for x in range(len(grid)):
         for y in range(len(grid[x])):
-            c = colorDict[grid[x][y]]
+            c = color_dict[grid[x][y]]
             sense.set_pixel(x, y, c)
 
 
 # Pick a random x and y until the space is empty
-def CreateApple():
-    x = randrange(GRID_LEN)
-    y = randrange(GRID_LEN)
+def create_apple():
+    """Places apple in a random unoccupied space."""
+    x = randrange(8)
+    y = randrange(8)
     while grid[x][y] != 0:
-        x = randrange(GRID_LEN)
-        y = randrange(GRID_LEN)
+        x = randrange(8)
+        y = randrange(8)
 
     grid[x][y] = APPLE
 
 
 # Triggered if all squares are body or head
-def Win():
-    # Play animation
-    pass
+def win_game():
+    """
+    Plays animation if player wins the game.
+    
+    Triggered if all squares are snake body or head.
+    """
+    # Checkerboard pattern to be filled later
+    checker = []
+
+    j = 0
+    for i in range(64):
+        i = i % 8
+
+        # offset every other row
+        if i == 0:
+            j += 1
+
+        c = PURPLE if (i + j) % 2 == 0 else WHITE
+        checker.append(c)
+
+    # Show 10 frames of animation
+    for _ in range(10):
+        sense.set_pixels(checker)
+
+        # Swap colors
+        for i in range(len(checker)):
+            checker[i] = PURPLE if checker[i] == WHITE else WHITE
+        sleep(1 / 6)
 
 
-def Update():
+def update_game():
+    """Handles dynamic events of the game."""
+
     # Wait for 1 second at the start, and speed up the higher the score gets
-    sleep(((GRID_SIZE + 1) - len(snake.segments)) / GRID_SIZE)
+    sleep((65 - len(snake.segments)) / 64)
 
     # Get input
 
@@ -215,36 +249,37 @@ def Update():
         # Remove oldest event from the queue.
         es.pop(0)
 
-    # Update positions
-    snake.Move()
+    # update_game positions
+    snake.move_snake()
 
     # Check for lose
-    die = snake.CheckForCollide()
+    die = snake.check_for_collision()
 
     # Check for eat
     if grid[snake.head.x][snake.head.y] == APPLE:
-        snake.Grow()
+        snake.grow_snake()
         # Check for win
         foundEmpty = False
-        for x in range(GRID_LEN):
+        for x in range(8):
             if foundEmpty:
                 break
-            for y in range(GRID_LEN):
+            for y in range(8):
                 if grid[x][y] == 0:
                     foundEmpty = True
                     break
         if foundEmpty:
-            CreateApple()
+            create_apple()
         else:
-            Win()
+            win_game()
             return False
 
-    # Update graphics
+    # update_game graphics
 
     ## Clear grid
-    for x in range(GRID_LEN):
-        for y in range(GRID_LEN):
+    for x in range(8):
+        for y in range(8):
             # Don't get rid of apples; we use these in gameplay logic.
+            # Logic and rendering shouldn't be mixed like this, but... I'm lazy
             if grid[x][y] != APPLE:
                 grid[x][y] = 0
 
@@ -253,32 +288,34 @@ def Update():
         grid[segment.x][segment.y] = BODY
     grid[snake.head.x][snake.head.y] = HEAD
 
-    DrawState()
+    draw_state()
 
     return not die
 
 
-def StartGame():
-    WipeScreen()
+def start_game():
+    """Initialize the game"""
+    wipe_screen()
 
     # Make an 8x8 grid
     global grid
-    grid = [[0] * GRID_LEN for _ in range(GRID_LEN)]
+    grid = [[0] * 8 for _ in range(8)]
 
     global snake
     snake = Snake()
 
-    CreateApple()
+    create_apple()
 
 
-def LoseScreen():
+def lose_screen():
+    """Animation pattern triggered if the player loses."""
 
     # Checkerboard pattern to be filled later
     checker = []
 
     j = 0
-    for i in range(GRID_SIZE):
-        i = i % GRID_LEN
+    for i in range(64):
+        i = i % 8
 
         # offset every other row
         if i == 0:
@@ -306,8 +343,7 @@ def LoseScreen():
 ###############
 
 while True:
-    StartGame()
-    while Update():
+    start_game()
+    while update_game():
         pass
-    LoseScreen()
-
+    lose_screen()
