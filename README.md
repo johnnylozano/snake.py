@@ -1,4 +1,4 @@
-# Snake.py
+# Snake Game for Raspberry Pi and Sense HAT
 <img
      src="./Demo/snake-demo.gif"
      alt="Demo of Snake game"
@@ -19,7 +19,7 @@ Intended for Raspberry Pi Model 4 with Sense HAT
 
 ## Installation:
 (Operate from Raspberry Pi command terminal or from Remote SSH connection)
-- To run this, either run `python3 Snake.py` or `chmod +x Snake.py; ./Snake.py`
+- To run this, either run `python3 snake.py` or `chmod +x snake.py; ./snake.py`
 - To stop it, press ctrl-c
 - To enable/disable on startup, edit sudo nano /etc/rc.local
 
