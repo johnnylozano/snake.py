@@ -45,6 +45,10 @@ RED = (255, 0, 0)
 PURPLE = (127, 0, 127)
 BLACK = (0, 0, 0)
 
+GRID_SIZE = 64
+GRID_LEN = 8
+DOUBLE_GRID_LEN = (2 * GRID_LEN) + 1
+
 # Integer -> color dictionary
 colorDict = {
     0: (0, 0, 0),  # blank
@@ -67,7 +71,7 @@ class Vec2:
 
 class Snake:
     def __init__(self):
-        self.segments = [Vec2(randrange(8), randrange(8))]
+        self.segments = [Vec2(randrange(GRID_LEN), randrange(GRID_LEN))]
         self.direction = [1, 0]
 
     # @property can be placed above methods to let them be accessed
@@ -92,8 +96,8 @@ class Snake:
         self.segments[0].y += self.direction[1]
 
         # And wrap around the field
-        self.segments[0].x %= 8
-        self.segments[0].y %= 8
+        self.segments[0].x %= GRID_LEN
+        self.segments[0].y %= GRID_LEN
 
     def CheckForCollide(self):
         # if len(self.segments) == 1:
@@ -116,12 +120,12 @@ def WipeScreen():
     c = 255
 
     # Create the 8 step gradient from white to black
-    for i in range(8):
+    for i in range(GRID_LEN):
         greys.append((c, c, c))
-        c = int(c * ((8 - i) / 8))
+        c = int(c * ((GRID_LEN - i) / GRID_LEN))
 
     # Pad with 8 blacks
-    for i in range(8):
+    for i in range(GRID_LEN):
         greys.append((0, 0, 0))
 
     # How many columns past the right end we are
@@ -129,32 +133,32 @@ def WipeScreen():
 
     # We want to fade *all* squares to black, so we need do 16 instead of 8.
     # xr stands for x right, xl stands for x left.
-    for xr in range(17):
-        if xr >= 8:
+    for xr in range(DOUBLE_GRID_LEN):
+        if xr >= GRID_LEN:
             over += 1
         for xl in range(xr):
             colIndex = 5 - xl + over
             # We can't set anything beyond x=7, so just skip them
-            if xl > 7:
+            if xl > (GRID_LEN - 1):
                 break
                 # continue
             # Set the whole column to the color
-            for y in range(8):
+            for y in range(GRID_LEN):
                 sense.set_pixel(xl, y, greys[colIndex])
         # Wait for a bit, otherwise it's not really an animation.
-        sleep(1 / 8)
+        sleep(1 / GRID_LEN)
 
     # Ready...
     sense.set_pixel(0, 0, 255, 0, 0)
     sleep(1)
     # Get set...
-    sense.set_pixel(7, 0, 255, 255, 0)
+    sense.set_pixel((GRID_LEN - 1), 0, 255, 255, 0)
     sleep(1)
     # And...
-    sense.set_pixel(0, 7, 255, 0, 255)
+    sense.set_pixel(0, (GRID_LEN - 1), 255, 0, 255)
     sleep(1)
     # Go!
-    sense.set_pixel(7, 7, 255, 255, 255)
+    sense.set_pixel((GRID_LEN - 1), (GRID_LEN - 1), 255, 255, 255)
     sleep(0.1)
 
 
@@ -168,11 +172,11 @@ def DrawState():
 
 # Pick a random x and y until the space is empty
 def CreateApple():
-    x = randrange(8)
-    y = randrange(8)
+    x = randrange(GRID_LEN)
+    y = randrange(GRID_LEN)
     while grid[x][y] != 0:
-        x = randrange(8)
-        y = randrange(8)
+        x = randrange(GRID_LEN)
+        y = randrange(GRID_LEN)
 
     grid[x][y] = APPLE
 
@@ -185,7 +189,7 @@ def Win():
 
 def Update():
     # Wait for 1 second at the start, and speed up the higher the score gets
-    sleep((65 - len(snake.segments)) / 64)
+    sleep(((GRID_SIZE + 1) - len(snake.segments)) / GRID_SIZE)
 
     # Get input
 
@@ -222,10 +226,10 @@ def Update():
         snake.Grow()
         # Check for win
         foundEmpty = False
-        for x in range(8):
+        for x in range(GRID_LEN):
             if foundEmpty:
                 break
-            for y in range(8):
+            for y in range(GRID_LEN):
                 if grid[x][y] == 0:
                     foundEmpty = True
                     break
@@ -238,8 +242,8 @@ def Update():
     # Update graphics
 
     ## Clear grid
-    for x in range(8):
-        for y in range(8):
+    for x in range(GRID_LEN):
+        for y in range(GRID_LEN):
             # Don't get rid of apples; we use these in gameplay logic.
             if grid[x][y] != APPLE:
                 grid[x][y] = 0
@@ -259,7 +263,7 @@ def StartGame():
 
     # Make an 8x8 grid
     global grid
-    grid = [[0] * 8 for _ in range(8)]
+    grid = [[0] * GRID_LEN for _ in range(GRID_LEN)]
 
     global snake
     snake = Snake()
@@ -273,8 +277,8 @@ def LoseScreen():
     checker = []
 
     j = 0
-    for i in range(64):
-        i = i % 8
+    for i in range(GRID_SIZE):
+        i = i % GRID_LEN
 
         # offset every other row
         if i == 0:
