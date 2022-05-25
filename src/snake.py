@@ -46,16 +46,16 @@ PURPLE = (127, 0, 127)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-GRID_SIZE = 64
 GRID_LEN = 8
-DOUBLE_GRID_LEN = (2 * GRID_LEN) + 1
+GRID_SIZE = GRID_LEN ** 2            # 8^2 => 64 Grid Size
+DOUBLE_GRID_LEN = (2 * GRID_LEN) + 1 # Specific to wide_screen() method
 
 # Integer -> color dictionary
 color_dict = {
     0: (0, 0, 0),  # blank
     APPLE: (255, 0, 0),  # red apple
-    BODY: (0, 255, 0),  # green snake
-    HEAD: (0, 0, 255),  # blue head
+    BODY: (0, 255, 0),   # green snake
+    HEAD: (0, 0, 255),   # blue head
 }
 
 
